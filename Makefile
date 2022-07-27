@@ -27,7 +27,7 @@ clean:
 	rm -f $(MOBJ)
 	make -C libft clean
 fclean:
-	rm -f $(MOBJ) $(NAME) libft.a libft_malloc.so test
+	rm -f $(MOBJ) $(NAME) libft_malloc.so test libft.a
 	make -C libft fclean
 
 test:
