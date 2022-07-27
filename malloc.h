@@ -22,7 +22,7 @@ typedef struct	s_alloc_zones {
 	void					*ptr;
 }				t_alloc_zones;
 
-t_alloc_zones *alloc_ptr = NULL;
+t_alloc_zones *allocs_ptr = NULL;
 
 //PUBLIC TOOLS
 void free(void *ptr);
