@@ -9,18 +9,28 @@ typedef struct	s_alloc_sizes {
 	size_t tiny_alloc;
 	size_t small_limit;
 	size_t small_alloc;
-
 }				t_alloc_sizes;
 
 typedef struct	s_heap_header {
-	size_t	len;
 	char	used;
-
+	size_t	len;
 }				t_heap_header;
 
+typedef struct	s_alloc_zones {
+	char					type; // 't' -> tiny, 's' -> small, 'l' -> large 
+	size_t					available_space;
+	void					*ptr;
+}				t_alloc_zones;
 
+t_alloc_zones *alloc_ptr = NULL;
+
+//PUBLIC TOOLS
 void free(void *ptr);
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t size);
+
+//INTERNAL TOOLS
+void *allocate(size_t size);
+void get_sizes(t_alloc_sizes *as);
 
 #endif

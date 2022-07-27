@@ -1,4 +1,4 @@
-MSRC = malloc.c
+MSRC = malloc.c utils.c
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 MOBJ = $(MSRC:.c=.o)
