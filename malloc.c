@@ -5,25 +5,21 @@ t_alloc_zones *allocs_ptr = NULL;
 void *small_alloc(size_t size, t_alloc_sizes as)
 {
 	void	*free_zone_ptr;
-	void	*free_slice_ptr;
+	char	*free_slice_ptr;
 
-	if (allocs_ptr) //Let's search for a free spot
+	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 's')))
 	{
-		if (!(free_zone_ptr = search_free_zone(size, 's')))
-			;//create_new_zone(size)
-		else
-		{
-			if ((free_slice_ptr = search_free_slice(size, free_zone_ptr, as.small_alloc)))
-				return (free_slice_ptr);
+		if (!(free_slice_ptr = create_new_zone('s', as, size)))
 			return (NULL);
-		}
 	}
 	else
 	{
-		if (!(allocs_ptr = allocate(sizeof(t_alloc_zones) + 1)))
+		if (!(free_slice_ptr = search_free_slice(size, free_zone_ptr, as.small_alloc)))
 			return (NULL);
 	}
-	return (NULL);
+	((t_heap_header *)free_slice_ptr)->len = size;
+	((t_heap_header *)free_slice_ptr)->used = (char) 1;
+	return (free_slice_ptr);
 }
 
 void *malloc(size_t size)

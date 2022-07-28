@@ -34,6 +34,6 @@ void get_sizes(t_alloc_sizes *as);
 void *search_free_zone(size_t size, char type);
 void *search_free_slice(size_t size, char *start_ptr, size_t zone_size);
 size_t find_block_size(size_t index, size_t zone_size, char *ptr);
-t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size);
+void *create_new_zone(char type, t_alloc_sizes as, size_t size);
 
 #endif

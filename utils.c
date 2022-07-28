@@ -70,7 +70,7 @@ size_t alloc_zone_len()
 	return i;
 }
 
-t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
+void *create_new_zone(char type, t_alloc_sizes as, size_t size)
 {
 	void *ptr;
 	size_t new_zones_size;
@@ -101,10 +101,10 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 		allocs_ptr->ptr = ptr;
 		*(char *)(allocs_ptr + 1) = '\0';
 		allocs_ptr->type = type;
-		return (allocs_ptr);
+		return (allocs_ptr->ptr);
 	}
 	//We're appending a new zone
-	new_zones_size = (alloc_zone_len() * sizeof(t_alloc_zones)) + 1;
+	new_zones_size = ((alloc_zone_len() + 1) * sizeof(t_alloc_zones)) + 1;
 	if (!(ptr = allocate(new_zones_size)))
 		return (NULL);
 	ft_memcpy(ptr, allocs_ptr, new_zones_size - sizeof(t_alloc_zones));
@@ -133,5 +133,5 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	(allocs_ptr + new_zones_size)->type = type;
 	(allocs_ptr + new_zones_size)->ptr = ptr;
 	*(char *)(allocs_ptr + (new_zones_size) + 1) = '\0';
-	return (allocs_ptr + new_zones_size);
+	return ((allocs_ptr + new_zones_size)->ptr);
 }
