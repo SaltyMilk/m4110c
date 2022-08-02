@@ -30,8 +30,8 @@ fclean:
 	rm -f $(MOBJ) $(NAME) libft_malloc.so test libft.a
 	make -C libft fclean
 
-test:
-	gcc test.c $(NAME) -o test; ./test
+test: test.c
+	gcc $? $(NAME) -o test; ./test
 
 re : fclean all
 

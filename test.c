@@ -3,7 +3,7 @@
 
 int main()
 {
-	void *ptr = malloc(5000);
-	printf("\nsizeof=%lu\n", (4096/100) - (sizeof(size_t) + sizeof(char)));	
+	void *ptr = malloc(4000);
+	void *ptrs = malloc(3900);
 	return (0);
 }

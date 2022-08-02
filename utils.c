@@ -65,6 +65,9 @@ size_t alloc_zone_len()
 {
 	size_t i = 0;
 
+	if (!allocs_ptr)
+		return 0;
+
 	while (*(char *)(allocs_ptr + i))
 		i++;
 	return i;
