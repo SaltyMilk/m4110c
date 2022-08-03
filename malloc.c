@@ -69,7 +69,7 @@ void sort_allocs(size_t *indexs, size_t n_zones)
 void show_alloc_mem()
 {
 	t_alloc_sizes as;
-	size_t n_zones = alloc_zones_len();
+	size_t n_zones = alloc_zone_len();
 
 	get_sizes(&as);
 	size_t	indexs[n_zones];
