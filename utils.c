@@ -5,8 +5,7 @@ extern t_alloc_zones *allocs_ptr;
 void *allocate(size_t size)
 {
 	void *ptr;
-
-	if ((ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0)) == MAP_FAILED)
+	if ((ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, 0, 0)) == MAP_FAILED)
 		return (NULL);
 	ft_bzero(ptr, size);
 	return (ptr);

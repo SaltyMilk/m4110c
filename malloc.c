@@ -6,7 +6,6 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 {
 	t_alloc_zones *free_zone_ptr;
 	char	*free_slice_ptr;
-
 	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 's')))
 	{
 		if (!(free_zone_ptr = create_new_zone('s', as, size)))
@@ -23,7 +22,6 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	free_zone_ptr->available_space -= size;
 	return (free_slice_ptr);
 }
-#include <stdio.h>
 void *malloc(size_t size)
 {
 	t_alloc_sizes as;
@@ -70,8 +68,19 @@ void show_alloc_mem()
 {
 	t_alloc_sizes as;
 	size_t n_zones = alloc_zone_len();
-
+	
 	get_sizes(&as);
 	size_t	indexs[n_zones];
+
 	sort_allocs(indexs, n_zones);
+
+	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
+	{
+		if (allocs_ptr[indexs[i]].type == 't')
+			ft_printf("TINY : ");
+		else if (allocs_ptr[indexs[i]].type == 's')
+			ft_printf("SMALL : ");
+		printf("Ox%llX\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
+		//Now we gotta parse the zone to display each block
+	}	
 }

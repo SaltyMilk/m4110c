@@ -3,6 +3,7 @@
 
 #include "libft/libft.h"
 #include <sys/mman.h>
+#include <stdio.h>
 
 typedef struct	s_alloc_sizes {
 	size_t tiny_limit;
@@ -22,11 +23,11 @@ typedef struct	s_alloc_zones {
 	void					*ptr;
 }				t_alloc_zones;
 
-
 //PUBLIC TOOLS
 void free(void *ptr);
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t size);
+void show_alloc_mem();
 
 //INTERNAL TOOLS
 void *allocate(size_t size);
