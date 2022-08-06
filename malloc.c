@@ -27,9 +27,9 @@ void *malloc(size_t size)
 	t_alloc_sizes as;
 
 	get_sizes(&as);
-	puts("---debug--");
+/*	puts("---debug--");
 	printf("slimit=%lu\n", as.small_limit);
-	printf("salloc=%lu\n", as.small_alloc);
+	printf("salloc=%lu\n", as.small_alloc);*/
 	if (size <= as.tiny_limit)
 	{
 		//
@@ -77,9 +77,9 @@ void show_alloc_mem()
 	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
 	{
 		if (allocs_ptr[indexs[i]].type == 't')
-			ft_printf("TINY : ");
+			printf("TINY : ");
 		else if (allocs_ptr[indexs[i]].type == 's')
-			ft_printf("SMALL : ");
+			printf("SMALL : ");
 		printf("Ox%llX\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
 	}	

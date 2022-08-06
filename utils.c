@@ -55,7 +55,7 @@ size_t find_block_size(size_t index, size_t zone_size, char *ptr)
 {
 	size_t start = index;
 
-	while (!ptr[index] && index < zone_size)
+	while (index < zone_size && !ptr[index])
 		index++;
 	return index - start;
 }
@@ -76,7 +76,6 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 {
 	void *ptr;
 	size_t new_zones_size;
-
 	if (!allocs_ptr)
 	{
 		if (!(allocs_ptr = allocate(sizeof(t_alloc_zones) + 1)))
@@ -105,6 +104,7 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 		allocs_ptr->type = type;
 		return (allocs_ptr);
 	}
+
 	//We're appending a new zone
 	new_zones_size = ((alloc_zone_len() + 1) * sizeof(t_alloc_zones)) + 1;
 	if (!(ptr = allocate(new_zones_size)))
