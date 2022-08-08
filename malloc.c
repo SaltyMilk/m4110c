@@ -80,7 +80,7 @@ void show_alloc_mem()
 			ft_printf("TINY : ");
 		else if (allocs_ptr[indexs[i]].type == 's')
 			ft_printf("SMALL : ");
-		printf("Ox%llX\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
+		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
 	}	
 }

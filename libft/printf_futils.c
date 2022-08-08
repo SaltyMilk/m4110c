@@ -73,7 +73,7 @@ char	conversion_handle(const char **fs, va_list a, int *char_print)
 				ultha(va_arg(a, t_ui), 0), char_print));
 	else if (c == 'X')
 		return (display_hstr(' ', flags,
-				ultha(va_arg(a, t_ui), 1), char_print));
+				ultha(va_arg(a, unsigned long long), 1), char_print));
 	else if (c == 'p')
 		return (display_ptr(' ', flags, ultha(va_arg(a, t_ul), 0), char_print));
 	return (1);
