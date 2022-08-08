@@ -67,16 +67,18 @@ int		hati(const char **hnbr)
 ** cap 0 = none-capital letters
 ** cap 1 = capital letters
 */
-
-char	*ultha(unsigned long long n, char cap)
+#include <stdio.h>
+char	*ultha(unsigned long long n, char cap, char *hexbuff)
 {
 	const char			*hexset;
-	char				*hstr;
 	int					hexdigits;
 	unsigned long long	inbr;
 
 	if (!n)
-		return (ft_strdup("0"));
+	{
+		hexbuff[0] = '0';
+		hexbuff[1] = '\0';
+	}
 	hexset = "0123456789ABCDEF";
 	if (!cap)
 		hexset = "0123456789abcdef";
@@ -85,13 +87,11 @@ char	*ultha(unsigned long long n, char cap)
 	while ((n = n / 16))
 		hexdigits++;
 	hexdigits++;
-	if (!(hstr = malloc((hexdigits + 1) * sizeof(char))))
-		return (NULL);
-	hstr[hexdigits] = 0;
+	hexbuff[hexdigits] = 0;
 	while (hexdigits--)
 	{
-		hstr[hexdigits] = hexset[inbr % 16];
+		hexbuff[hexdigits] = hexset[inbr % 16];
 		inbr /= 16;
 	}
-	return (hstr);
+	return (hexbuff);
 }

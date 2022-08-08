@@ -117,6 +117,5 @@ void		put_cc(long long n, char *s, char mod, int *char_print)
 		if (!s)
 			return ;
 		ft_putstr_fd(s, 1, char_print);
-		free(s);
 	}
 }

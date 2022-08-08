@@ -19,6 +19,6 @@
 
 int		oati(const char **onbr);
 int		hati(const char **hnbr);
-char	*ultha(unsigned long long n, char cap);
+char	*ultha(unsigned long long n, char cap, char *hexbuff);
 
 #endif
