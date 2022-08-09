@@ -68,7 +68,8 @@ void show_alloc_mem()
 {
 	t_alloc_sizes as;
 	size_t n_zones = alloc_zone_len();
-	
+	size_t total = 0;
+
 	get_sizes(&as);
 	size_t	indexs[n_zones];
 
@@ -82,5 +83,9 @@ void show_alloc_mem()
 			ft_printf("SMALL : ");
 		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
-	}	
+		if (allocs_ptr[indexs[i]].type == 's')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc);
+	}
+
+	ft_printf("Total : %u bytes\n", total);	
 }

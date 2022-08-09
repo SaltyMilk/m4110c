@@ -137,3 +137,25 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	*(char *)(allocs_ptr + (new_zones_size) + 1) = '\0';
 	return ((allocs_ptr + new_zones_size));
 }
+
+size_t print_zone(char *ptr, size_t size)
+{
+	size_t i = 0;
+	size_t ret = 0;
+
+	while (i < size)
+	{
+		if (*(ptr + i))
+		{
+			ft_printf("0x%X - 0x%X : %u bytes\n", (ptr + i) + sizeof(t_heap_header), (ptr + i) + sizeof(t_heap_header) + ((t_heap_header *)(ptr + i))->len, ((t_heap_header *)(ptr + i))->len);
+			ret += ((t_heap_header *)(ptr + i))->len;
+			i += ((t_heap_header *)(ptr + i))->len + sizeof(t_heap_header);
+		}
+		else
+		{
+			while (i < size && !*(ptr + i))
+				i++;
+		}
+	}
+	return ret;
+}
