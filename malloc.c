@@ -22,6 +22,7 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	free_zone_ptr->available_space -= size;
 	return (free_slice_ptr);
 }
+
 void *malloc(size_t size)
 {
 	t_alloc_sizes as;
@@ -43,25 +44,31 @@ void *malloc(size_t size)
 	return (NULL);
 }
 
-//Will modify indexs to have a list of index by sorted (small -> big) zone index
-void sort_allocs(size_t *indexs, size_t n_zones)
+//For each block I have to check 
+t_alloc_zones *find_zone_by_ptr(void *ptr)
 {
-	for (size_t i = 0; i < n_zones; i++)
-		indexs[i] = (size_t)-1; //default value (case where allocs_ptr->ptr == null)
+	size_t n_zones = alloc_zone_len();
+	t_alloc_sizes as;
+
+	get_sizes(&as);
+
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		void *min = (void *)-1;
-		size_t min_index = 0;
-		for (size_t j = 0; j < n_zones; j++)
-		{
-			if (allocs_ptr[j].ptr && allocs_ptr[j].ptr < min)
-			{
-				min = allocs_ptr[j].ptr;
-				min_index = j;
-			}
-		}
-		indexs[i] = min_index;
+		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr >= ptr && (allocs_ptr + i)->ptr < (allocs_ptr + i)->ptr + as.small_limit)
+			return (allocs_ptr + i);
+		//add handles for other types
 	}
+	
+
+	return (NULL);	
+}
+
+void free(void *ptr)
+{
+	t_alloc_zones *zone = find_zone_by_ptr(ptr);
+
+	if (!zone)
+		return;
 }
 
 void show_alloc_mem()

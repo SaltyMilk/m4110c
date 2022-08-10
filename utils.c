@@ -159,3 +159,24 @@ size_t print_zone(char *ptr, size_t size)
 	}
 	return ret;
 }
+
+//Will modify indexs to have a list of index by sorted (small -> big) zone index
+void sort_allocs(size_t *indexs, size_t n_zones)
+{
+	for (size_t i = 0; i < n_zones; i++)
+		indexs[i] = (size_t)-1; //default value (case where allocs_ptr->ptr == null)
+	for (size_t i = 0; i < n_zones; i++)
+	{
+		void *min = (void *)-1;
+		size_t min_index = 0;
+		for (size_t j = 0; j < n_zones; j++)
+		{
+			if (allocs_ptr[j].ptr && allocs_ptr[j].ptr < min)
+			{
+				min = allocs_ptr[j].ptr;
+				min_index = j;
+			}
+		}
+		indexs[i] = min_index;
+	}
+}
