@@ -67,13 +67,8 @@ void free(void *ptr)
 {
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 
-	if (!zone)
-	{
-		ft_printf("Invalid ptr!\n");
+	if (!zone || !((t_heap_header *)ptr)->used)//None allocated, or not used blocks will be ignored
 		return;
-	}
-	else
-		ft_printf("Valid ptr !\n");
 
 }
 
