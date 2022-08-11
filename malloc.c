@@ -54,7 +54,7 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr >= ptr && (allocs_ptr + i)->ptr < (allocs_ptr + i)->ptr + as.small_limit)
+		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_limit)
 			return (allocs_ptr + i);
 		//add handles for other types
 	}
@@ -68,7 +68,13 @@ void free(void *ptr)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 
 	if (!zone)
+	{
+		ft_printf("Invalid ptr!\n");
 		return;
+	}
+	else
+		ft_printf("Valid ptr !\n");
+
 }
 
 void show_alloc_mem()
