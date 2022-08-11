@@ -39,5 +39,6 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size);
 size_t alloc_zone_len();
 size_t print_zone(char *ptr, size_t size);
 void sort_allocs(size_t *indexs, size_t n_zones);
+t_alloc_zones *find_zone_by_ptr(void *ptr);
 
 #endif

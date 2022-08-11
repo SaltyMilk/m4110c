@@ -27,7 +27,7 @@ t_alloc_zones *search_free_zone(size_t size, char type)
 
 		while (*(char *)(allocs_ptr + i))
 		{
-			if ((allocs_ptr + i)->type == type && (allocs_ptr + i)->available_space >= size)
+			if ((allocs_ptr + i)->type == type && (allocs_ptr + i)->available_space >= size + sizeof(t_heap_header))
 				return (allocs_ptr + i);
 			i++;
 		}
@@ -179,4 +179,22 @@ void sort_allocs(size_t *indexs, size_t n_zones)
 		}
 		indexs[i] = min_index;
 	}
+}
+
+t_alloc_zones *find_zone_by_ptr(void *ptr)
+{
+	size_t n_zones = alloc_zone_len();
+	t_alloc_sizes as;
+
+	get_sizes(&as);
+
+	for (size_t i = 0; i < n_zones; i++)
+	{
+		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_limit)
+			return (allocs_ptr + i);
+		//add handles for other types
+	}
+	
+
+	return (NULL);	
 }

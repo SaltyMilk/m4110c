@@ -44,32 +44,16 @@ void *malloc(size_t size)
 	return (NULL);
 }
 
-//For each block I have to check 
-t_alloc_zones *find_zone_by_ptr(void *ptr)
-{
-	size_t n_zones = alloc_zone_len();
-	t_alloc_sizes as;
-
-	get_sizes(&as);
-
-	for (size_t i = 0; i < n_zones; i++)
-	{
-		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_limit)
-			return (allocs_ptr + i);
-		//add handles for other types
-	}
-	
-
-	return (NULL);	
-}
-
 void free(void *ptr)
 {
+	size_t block_size;
+
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 
 	if (!zone || !((t_heap_header *)ptr)->used)//None allocated, or not used blocks will be ignored
 		return;
-
+	block_size = ((t_heap_header *)ptr)->len;
+	zone->available_space += block_size + sizeof(t_heap_header);
 }
 
 void show_alloc_mem()
