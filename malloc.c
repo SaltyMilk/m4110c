@@ -20,7 +20,7 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	((t_heap_header *)free_slice_ptr)->len = size;
 	((t_heap_header *)free_slice_ptr)->used = (char) 1;
 	free_zone_ptr->available_space -= size;
-	return (free_slice_ptr);
+	return (free_slice_ptr + sizeof(t_heap_header));
 }
 
 void *malloc(size_t size)
