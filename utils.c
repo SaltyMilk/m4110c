@@ -82,13 +82,13 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 			return (NULL);
 		if (type == 's')
 		{
-			allocs_ptr->available_space = as.small_alloc - (size + sizeof(t_heap_header));
+			allocs_ptr->available_space = as.small_alloc;
 			if (!(ptr = allocate(as.small_alloc)))
 				return (NULL);
 		}
 		else if (type == 't')
 		{
-			allocs_ptr->available_space = as.tiny_alloc - (size + sizeof(t_heap_header));
+			allocs_ptr->available_space = as.tiny_alloc;
 			if (!(ptr = allocate(as.tiny_alloc)))
 				return (NULL);
 		}
@@ -116,13 +116,13 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	allocs_ptr = ptr;
 	if (type == 's')
 	{
-		(allocs_ptr + new_zones_size)->available_space = as.small_alloc - (size + sizeof(t_heap_header));
+		(allocs_ptr + new_zones_size)->available_space = as.small_alloc;
 			if (!(ptr = allocate(as.small_alloc)))
 				return (NULL);	
 	}
 	else if (type == 't')
 	{
-		(allocs_ptr + new_zones_size)->available_space = as.tiny_alloc - (size + sizeof(t_heap_header));
+		(allocs_ptr + new_zones_size)->available_space = as.tiny_alloc;
 			if (!(ptr = allocate(as.tiny_alloc)))
 				return (NULL);		
 	}
@@ -168,7 +168,7 @@ void sort_allocs(size_t *indexs, size_t n_zones)
 	for (size_t i = 0; i < n_zones; i++)
 	{
 		void *min = (void *)-1;
-		size_t min_index = 0;
+		size_t min_index = -1;
 		for (size_t j = 0; j < n_zones; j++)
 		{
 			if (allocs_ptr[j].ptr && allocs_ptr[j].ptr < min)

@@ -19,7 +19,7 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	}
 	((t_heap_header *)free_slice_ptr)->len = size;
 	((t_heap_header *)free_slice_ptr)->used = (char) 1;
-	free_zone_ptr->available_space -= size;
+	free_zone_ptr->available_space -= (size + sizeof(t_heap_header));
 	return (free_slice_ptr + sizeof(t_heap_header));
 }
 
@@ -47,13 +47,26 @@ void *malloc(size_t size)
 void free(void *ptr)
 {
 	size_t block_size;
+	t_alloc_sizes as;
+	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
 
+	if (!ptr)
+		return;
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 
-	if (!zone || !((t_heap_header *)ptr)->used)//None allocated, or not used blocks will be ignored
+	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 		return;
-	block_size = ((t_heap_header *)ptr)->len;
+	block_size = ptrh->len;
 	zone->available_space += block_size + sizeof(t_heap_header);
+	ft_bzero(ptrh, block_size + sizeof(t_heap_header));
+	get_sizes(&as);
+	if ((zone->type == 't' && zone->available_space == as.tiny_alloc)  ||
+		(zone->type == 's' && zone->available_space == as.small_alloc) ||
+		zone->type == 'l')
+	{
+		munmap(zone->ptr, zone->available_space);
+		zone->ptr = NULL;
+	}
 }
 
 void show_alloc_mem()
@@ -66,7 +79,6 @@ void show_alloc_mem()
 	size_t	indexs[n_zones];
 
 	sort_allocs(indexs, n_zones);
-
 	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
 	{
 		if (allocs_ptr[indexs[i]].type == 't')
