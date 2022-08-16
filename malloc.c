@@ -14,6 +14,8 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	}
 	else
 	{
+		if (!free_zone_ptr->ptr && allocate_ptr('s', as, free_zone_ptr, 19))
+			return (NULL);
 		if (!(free_slice_ptr = search_free_slice(size, free_zone_ptr->ptr, as.small_alloc)))
 			return (NULL);
 	}

@@ -27,7 +27,7 @@ t_alloc_zones *search_free_zone(size_t size, char type)
 
 		while (*(char *)(allocs_ptr + i))
 		{
-			if ((allocs_ptr + i)->type == type && (allocs_ptr + i)->available_space >= size + sizeof(t_heap_header))
+			if ((allocs_ptr + i)->type == type && ( (allocs_ptr + i)->available_space >= size + sizeof(t_heap_header) || !(allocs_ptr +i)->ptr))
 				return (allocs_ptr + i);
 			i++;
 		}
@@ -95,7 +95,7 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 		else // 'l'
 		{
 			allocs_ptr->available_space = 0;
-			if (!(ptr = allocate(size)))
+			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);
 		}
 		//Common part
@@ -129,7 +129,7 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	else // 'l'
 	{
 		(allocs_ptr + new_zones_size)->available_space = 0;
-			if (!(ptr = allocate(size)))
+			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);		
 	}
 	(allocs_ptr + new_zones_size)->type = type;
@@ -197,4 +197,29 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 	
 
 	return (NULL);	
+}
+
+//size is only usefull for large allocs
+int allocate_ptr(char type, t_alloc_sizes as, t_alloc_zones *zone, size_t size)
+{
+
+	if (type == 's')
+	{
+		if (!(zone->ptr = allocate(as.small_alloc)))
+			return 1;
+		zone->available_space = as.small_alloc; // just for good measure but shouldn't be needed
+	}
+	else if (type == 't')
+	{
+		if (!(zone->ptr = allocate(as.tiny_alloc)))
+			return 1;
+		zone->available_space = as.tiny_alloc;
+	}
+	else // 'l'
+	{
+		if (!(zone->ptr = allocate(size + sizeof(t_heap_header))))
+			return 1;
+		zone->available_space = size + sizeof(t_heap_header); //this is mandatory !
+	}
+	return 0;
 }
