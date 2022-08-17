@@ -112,8 +112,8 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	ft_memcpy(ptr, allocs_ptr, new_zones_size - sizeof(t_alloc_zones));
 	if (munmap(allocs_ptr, new_zones_size - sizeof(t_alloc_zones)) == -1)
 		return (NULL);
-	new_zones_size = alloc_zone_len();
 	allocs_ptr = ptr;
+	new_zones_size = alloc_zone_len();
 	if (type == 's')
 	{
 		(allocs_ptr + new_zones_size)->available_space = as.small_alloc;
@@ -160,6 +160,15 @@ size_t print_zone(char *ptr, size_t size)
 	return ret;
 }
 
+//return 1 if true
+int is_in_starr(size_t *arr, size_t size, size_t value)
+{
+	for (size_t i = 0; i < size; i++)
+		if (arr[i] == value)
+			return 1;
+	return 0;
+}
+
 //Will modify indexs to have a list of index by sorted (small -> big) zone index
 void sort_allocs(size_t *indexs, size_t n_zones)
 {
@@ -173,6 +182,8 @@ void sort_allocs(size_t *indexs, size_t n_zones)
 		{
 			if (allocs_ptr[j].ptr && allocs_ptr[j].ptr < min)
 			{
+				if (is_in_starr(indexs, n_zones, j))
+					continue;
 				min = allocs_ptr[j].ptr;
 				min_index = j;
 			}
