@@ -190,7 +190,9 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_limit)
+		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_alloc)
+			return (allocs_ptr + i);
+		else if ((allocs_ptr + i)->type == 't' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.tiny_alloc)
 			return (allocs_ptr + i);
 		//add handles for other types
 	}

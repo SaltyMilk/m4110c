@@ -25,6 +25,30 @@ void *small_alloc(size_t size, t_alloc_sizes as)
 	return (free_slice_ptr + sizeof(t_heap_header));
 }
 
+
+void *tiny_alloc(size_t size, t_alloc_sizes as)
+{
+	t_alloc_zones *free_zone_ptr;
+	char	*free_slice_ptr;
+	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 't')))
+	{
+		if (!(free_zone_ptr = create_new_zone('t', as, size)))
+			return (NULL);
+		free_slice_ptr = free_zone_ptr->ptr;
+	}
+	else
+	{
+		if (!free_zone_ptr->ptr && allocate_ptr('t', as, free_zone_ptr, 19))
+			return (NULL);
+		if (!(free_slice_ptr = search_free_slice(size, free_zone_ptr->ptr, as.tiny_alloc)))
+			return (NULL);
+	}
+	((t_heap_header *)free_slice_ptr)->len = size;
+	((t_heap_header *)free_slice_ptr)->used = (char) 1;
+	free_zone_ptr->available_space -= (size + sizeof(t_heap_header));
+	return (free_slice_ptr + sizeof(t_heap_header));
+}
+
 void *malloc(size_t size)
 {
 	t_alloc_sizes as;
@@ -34,9 +58,7 @@ void *malloc(size_t size)
 	printf("slimit=%lu\n", as.small_limit);
 	printf("salloc=%lu\n", as.small_alloc);*/
 	if (size <= as.tiny_limit)
-	{
-		//
-	}	
+		return tiny_alloc(size, as);	
 	else if (size <= as.small_limit)
 		return small_alloc(size, as);
 	else
@@ -55,7 +77,6 @@ void free(void *ptr)
 	if (!ptr)
 		return;
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
-
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 		return;
 	block_size = ptrh->len;
@@ -91,6 +112,8 @@ void show_alloc_mem()
 		//Now we gotta parse the zone to display each block
 		if (allocs_ptr[indexs[i]].type == 's')
 			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc);
+		else if (allocs_ptr[indexs[i]].type == 't')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc);
 	}
 
 	ft_printf("Total : %u bytes\n", total);	

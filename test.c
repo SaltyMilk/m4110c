@@ -3,11 +3,9 @@
 
 int main()
 {
-	void *ptr = malloc(4000);
-//	printf("1st alloc= %p\n", ptr);
-	void *ptrs = malloc(3900);
-//	printf("2nd alloc= %p\n", ptrs);
-	show_alloc_mem();
+//	void *ptr = malloc(4000);
+	void *ptrs;// = malloc(3900);
+/*	show_alloc_mem();
 	printf("---\n");
 	free(ptr);
 	show_alloc_mem();
@@ -19,6 +17,13 @@ int main()
 	show_alloc_mem();
 	printf("---\n");
 	free(ptr);
+	show_alloc_mem();
+	printf("---\n");*/
+	//ptr = malloc(4000);
+	ptrs = malloc(19);
+	show_alloc_mem();
+	printf("---\n");
+	free(ptrs);
 	show_alloc_mem();
 	printf("---\n");
 	
