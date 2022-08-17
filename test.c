@@ -28,8 +28,15 @@ int main()
 	free(ptrs);
 	show_alloc_mem();
 	printf("---\n");
-	
-	
+	ptrs = malloc(42019);
+	show_alloc_mem();
+	printf("---\n");
+	free(ptr);
+	show_alloc_mem();
+	printf("---\n");
+	free(ptrs);	
+	show_alloc_mem();
+	printf("---\n");
 	
 	
 	free((void *) 0x4242424242424242);

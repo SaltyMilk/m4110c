@@ -94,7 +94,7 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 		}
 		else // 'l'
 		{
-			allocs_ptr->available_space = 0;
+			allocs_ptr->available_space = size + sizeof(t_heap_header);
 			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);
 		}
@@ -128,7 +128,7 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	}
 	else // 'l'
 	{
-		(allocs_ptr + new_zones_size)->available_space = 0;
+		(allocs_ptr + new_zones_size)->available_space = size + sizeof(t_heap_header);
 			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);		
 	}
@@ -142,7 +142,8 @@ size_t print_zone(char *ptr, size_t size)
 {
 	size_t i = 0;
 	size_t ret = 0;
-
+	if (!size)
+		size = ((t_heap_header *)ptr)->len + sizeof(t_heap_header);
 	while (i < size)
 	{
 		if (*(ptr + i))
@@ -205,7 +206,8 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 			return (allocs_ptr + i);
 		else if ((allocs_ptr + i)->type == 't' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.tiny_alloc)
 			return (allocs_ptr + i);
-		//add handles for other types
+		else if ((allocs_ptr + i)->type == 'l' && (allocs_ptr + i)->ptr && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + ((t_heap_header *)(allocs_ptr + i)->ptr)->len + sizeof(t_heap_header))
+			return (allocs_ptr + i);
 	}
 	
 
