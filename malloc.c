@@ -52,24 +52,20 @@ void *tiny_alloc(size_t size, t_alloc_sizes as)
 void *large_alloc(size_t size, t_alloc_sizes as)
 {
 	t_alloc_zones *free_zone_ptr;
-	char	*free_slice_ptr;
 	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 'l')))
 	{
 		if (!(free_zone_ptr = create_new_zone('l', as, size)))
 			return (NULL);
-		free_slice_ptr = free_zone_ptr->ptr;
 	}
 	else
 	{
-		if (!free_zone_ptr->ptr && allocate_ptr('l', as, free_zone_ptr, 19))
-			return (NULL);
-		if (!(free_slice_ptr = search_free_slice(size, free_zone_ptr->ptr, size + sizeof(t_heap_header))))
+		if (!free_zone_ptr->ptr && allocate_ptr('l', as, free_zone_ptr, size))
 			return (NULL);
 	}
-	((t_heap_header *)free_slice_ptr)->len = size;
-	((t_heap_header *)free_slice_ptr)->used = (char) 1;
+	((t_heap_header *)(free_zone_ptr)->ptr)->len = size;
+	((t_heap_header *)(free_zone_ptr)->ptr)->used = (char) 1;
 	free_zone_ptr->available_space -= (size + sizeof(t_heap_header));
-	return (free_slice_ptr + sizeof(t_heap_header));
+	return (free_zone_ptr->ptr + sizeof(t_heap_header));
 }
 
 void *malloc(size_t size)
@@ -77,9 +73,6 @@ void *malloc(size_t size)
 	t_alloc_sizes as;
 
 	get_sizes(&as);
-/*	puts("---debug--");
-	printf("slimit=%lu\n", as.small_limit);
-	printf("salloc=%lu\n", as.small_alloc);*/
 	if (size <= as.tiny_limit)
 		return tiny_alloc(size, as);	
 	else if (size <= as.small_limit)
@@ -102,16 +95,22 @@ void *realloc(void *ptr, size_t size)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 		return NULL;
+	get_sizes(&as);
 	block_size = ptrh->len;
 	if (!(tmp = allocate(block_size)))
 		return NULL;
 	ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
-	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)) && zone->type != 'l')
+	//if we don't need a zone transfer
+	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
 	{
 		if (zone->type == 't')
 		{
-			if (ptr + size < zone->ptr + as.tiny_alloc)
+			if (ptr + size < zone->ptr + as.tiny_alloc)//we can just increase block size
+			{
+				zone->available_space += ptrh->len;
+				zone->available_space -= size;
 				ptrh->len = size;
+			}
 			else
 			{
 				free(ptr);
@@ -126,7 +125,11 @@ void *realloc(void *ptr, size_t size)
 		else if (zone->type == 's')
 		{
 			if (ptr + size < zone->ptr + as.small_alloc)
+			{
+				zone->available_space += ptrh->len;
+				zone->available_space -= size;
 				ptrh->len = size;
+			}
 			else
 			{
 				free(ptr);
@@ -139,7 +142,7 @@ void *realloc(void *ptr, size_t size)
 			}	
 		}
 	}
-	else
+	else //zone transfer
 	{
 		free(ptr);
 		if (!(ret = malloc(size)))
