@@ -1,6 +1,8 @@
 #include "malloc.h"
 
-t_alloc_zones *allocs_ptr = NULL;
+t_alloc_zones				*allocs_ptr	= NULL;
+static pthread_mutex_t		mutex		= PTHREAD_MUTEX_INITIALIZER;
+
 
 void *small_alloc(size_t size, t_alloc_sizes as)
 {
@@ -71,15 +73,28 @@ void *large_alloc(size_t size, t_alloc_sizes as)
 void *malloc(size_t size)
 {
 	t_alloc_sizes as;
+	void *ret;
 
+	pthread_mutex_lock(&mutex);
 	get_sizes(&as);
 	if (size <= as.tiny_limit)
-		return tiny_alloc(size, as);	
+	{
+		ret = tiny_alloc(size, as);	
+		pthread_mutex_unlock(&mutex);
+		return ret;
+	}
 	else if (size <= as.small_limit)
-		return small_alloc(size, as);
+	{
+		ret = small_alloc(size, as);
+		pthread_mutex_unlock(&mutex);
+		return ret;
+	}
 	else
-		return large_alloc(size, as);
-	return (NULL);
+	{
+		ret = large_alloc(size, as);
+		pthread_mutex_unlock(&mutex);
+		return ret;
+	}
 }
 
 void *realloc(void *ptr, size_t size)
@@ -92,13 +107,20 @@ void *realloc(void *ptr, size_t size)
 
 	if (!ptr)
 		return NULL;
+	pthread_mutex_lock(&mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
+	{
+		pthread_mutex_unlock(&mutex);
 		return NULL;
+	}
 	get_sizes(&as);
 	block_size = ptrh->len;
 	if (!(tmp = allocate(block_size)))
+	{
+		pthread_mutex_unlock(&mutex);
 		return NULL;
+	}
 	ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
 	//if we don't need a zone transfer
 	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
@@ -113,9 +135,11 @@ void *realloc(void *ptr, size_t size)
 			}
 			else
 			{
+				pthread_mutex_unlock(&mutex);
 				free(ptr);
 				if (!(ret = malloc(size)))
 					return NULL;
+				pthread_mutex_lock(&mutex);
 				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
@@ -132,9 +156,11 @@ void *realloc(void *ptr, size_t size)
 			}
 			else
 			{
+				pthread_mutex_unlock(&mutex);
 				free(ptr);
 				if (!(ret = malloc(size)))
 					return NULL;
+				pthread_mutex_lock(&mutex);
 				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
@@ -144,15 +170,18 @@ void *realloc(void *ptr, size_t size)
 	}
 	else //zone transfer
 	{
+		pthread_mutex_unlock(&mutex);
 		free(ptr);
 		if (!(ret = malloc(size)))
 			return NULL;
+		pthread_mutex_lock(&mutex);
 		if (size >= block_size)
 			ft_memcpy(ret, tmp, block_size);
 		else
 			ft_memcpy(ret, tmp, size);
 	}
 	munmap(tmp, block_size);
+	pthread_mutex_unlock(&mutex);
 	return ret;
 }
 
@@ -164,9 +193,13 @@ void free(void *ptr)
 
 	if (!ptr)
 		return;
+	pthread_mutex_lock(&mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
+	{
+		pthread_mutex_unlock(&mutex);
 		return;
+	}
 	block_size = ptrh->len;
 	zone->available_space += block_size + sizeof(t_heap_header);
 	ft_bzero(ptrh, block_size + sizeof(t_heap_header));
@@ -178,10 +211,12 @@ void free(void *ptr)
 		munmap(zone->ptr, zone->available_space);
 		zone->ptr = NULL;
 	}
+	pthread_mutex_unlock(&mutex);
 }
 
 void show_alloc_mem()
 {
+	pthread_mutex_lock(&mutex);
 	t_alloc_sizes as;
 	size_t n_zones = alloc_zone_len();
 	size_t total = 0;
@@ -209,4 +244,5 @@ void show_alloc_mem()
 	}
 
 	ft_printf("Total : %u bytes\n", total);	
+	pthread_mutex_unlock(&mutex);
 }

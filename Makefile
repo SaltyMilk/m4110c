@@ -13,7 +13,7 @@ NAME = libft_malloc_$(HOSTTYPE).so
 all: libft.a $(NAME)
 
 $(NAME): $(MOBJ)
-	gcc $(CFLAGS) libft.a $? -shared -o $(NAME)
+	gcc $(CFLAGS) libft.a $? -shared -o $(NAME) -lpthread
 	ln -s $(NAME) libft_malloc.so
 
 %.o: %.c

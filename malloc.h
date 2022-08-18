@@ -3,7 +3,7 @@
 
 #include "libft/libft.h"
 #include <sys/mman.h>
-#include <stdio.h>
+#include <pthread.h>
 
 typedef struct	s_alloc_sizes {
 	size_t tiny_limit;
