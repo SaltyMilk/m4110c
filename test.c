@@ -1,6 +1,6 @@
 #include "malloc.h"
 #include <stdio.h>
-
+#include <string.h>
 
 int main()
 {
@@ -33,11 +33,20 @@ int main()
 	ptr3 = realloc(ptr3, 42069);
 	show_alloc_mem();
 
-	puts("\nAt 42 I learned that I should always free memory !");
+	puts("\nAt 42 I learned that I should always free memory !\n");
 	free(ptr);
 	free(ptr2);
 	free(ptr3);
 	free(ptr4);
 	show_alloc_mem();
+	puts("Heh apparently you have a cool function that hexdumps, let's see it !\n");
+	ptr2 = malloc(42);
+	memcpy(ptr2, "531-M31C \x42\x19\x69\x13\x37\x69\x19\x42 weird idk what to write", 41);
+	ptr2[42] = 0;
+
+	show_alloc_mem_ex();
+	free(ptr);
+	puts("Let's just check we left no leaks");
+	show_alloc_mem_ex();
 	return (0);
 }

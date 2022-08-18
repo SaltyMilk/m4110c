@@ -236,13 +236,47 @@ void show_alloc_mem()
 		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
 		if (allocs_ptr[indexs[i]].type == 's')
-			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc);
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc, 0);
 		else if (allocs_ptr[indexs[i]].type == 't')
-			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc);
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 0);
 		else if (allocs_ptr[indexs[i]].type == 'l')
-			total += print_zone(allocs_ptr[indexs[i]].ptr, 0);
+			total += print_zone(allocs_ptr[indexs[i]].ptr, 0, 0);
 	}
 
 	ft_printf("Total : %u bytes\n", total);	
 	pthread_mutex_unlock(&mutex);
+}
+
+void show_alloc_mem_ex()
+{
+	pthread_mutex_lock(&mutex);
+	t_alloc_sizes as;
+	size_t n_zones = alloc_zone_len();
+	size_t total = 0;
+
+	get_sizes(&as);
+	size_t	indexs[n_zones];
+
+	sort_allocs(indexs, n_zones);
+	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
+	{
+		if (allocs_ptr[indexs[i]].type == 't')
+			ft_printf("TINY : ");
+		else if (allocs_ptr[indexs[i]].type == 's')
+			ft_printf("SMALL : ");
+		else if (allocs_ptr[indexs[i]].type == 'l')
+			ft_printf("LARGE : ");
+		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
+		//Now we gotta parse the zone to display each block
+		if (allocs_ptr[indexs[i]].type == 's')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc, 1);
+		else if (allocs_ptr[indexs[i]].type == 't')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 1);
+		else if (allocs_ptr[indexs[i]].type == 'l')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, 0, 1);
+	}
+
+	ft_printf("Total : %u bytes\n", total);	
+	pthread_mutex_unlock(&mutex);
+
 }

@@ -137,8 +137,8 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 	*(char *)(allocs_ptr + (new_zones_size) + 1) = '\0';
 	return ((allocs_ptr + new_zones_size));
 }
-
-size_t print_zone(char *ptr, size_t size)
+//mode = 0 no hexdump, 1 hexdumps blocks
+size_t print_zone(char *ptr, size_t size, char mode)
 {
 	size_t i = 0;
 	size_t ret = 0;
@@ -149,6 +149,8 @@ size_t print_zone(char *ptr, size_t size)
 		if (*(ptr + i))
 		{
 			ft_printf("0x%X - 0x%X : %u bytes\n", (ptr + i) + sizeof(t_heap_header), (ptr + i) + sizeof(t_heap_header) + ((t_heap_header *)(ptr + i))->len, ((t_heap_header *)(ptr + i))->len);
+			if (mode)
+				hexdump((ptr + i) + sizeof(t_heap_header), ((t_heap_header *)(ptr + i))->len);
 			ret += ((t_heap_header *)(ptr + i))->len;
 			i += ((t_heap_header *)(ptr + i))->len + sizeof(t_heap_header);
 		}
@@ -237,4 +239,38 @@ int allocate_ptr(char type, t_alloc_sizes as, t_alloc_zones *zone, size_t size)
 		zone->available_space = size + sizeof(t_heap_header); //this is mandatory !
 	}
 	return 0;
+}
+
+void hexdump(char *ptr, size_t size)
+{
+	ft_printf("Hexdump of block:");
+	for (size_t i = 0; i < size; i++)
+	{
+		if (!(i % 16))
+			ft_printf("\n");
+		if (ft_isprint(ptr[i]) && !ft_isspace(ptr[i]))
+			ft_printf(GREEN);
+		else
+			ft_printf(RED);
+		ft_printf("%2X ", ptr[i]);
+	}
+		ft_printf(RESET);
+	ft_printf("\nHuman readable:");
+	for (size_t i = 0; i < size; i++)
+	{
+		if (!(i % 16))
+			ft_printf("\n");
+		if (ft_isprint(ptr[i]) && !ft_isspace(ptr[i]))
+		{
+			ft_printf(GREEN);
+			ft_printf("%c  ", ptr[i]);
+		}
+		else
+		{
+			ft_printf(RED);
+			ft_printf(".  ");
+		}
+	}
+		ft_printf("\n\n");
+		ft_printf(RESET);
 }

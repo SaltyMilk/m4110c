@@ -20,7 +20,7 @@ MSRC = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c \
 	   ft_strnstr.c ft_strrchr.c ft_strtrim.c ft_substr.c \
 	   ft_tolower.c ft_toupper.c\
 	   ft_printf.c is_cof.c option_flags.c pflib.c printf_futils.c \
-	   conv_display.c base_conversion.c pflib2.c ft_pow_bonus.c
+	   conv_display.c base_conversion.c pflib2.c ft_pow_bonus.c ft_isspace.c
 BSRC = ft_lstadd_back_bonus.c ft_lstadd_front_bonus.c ft_lstclear_bonus.c \
 	   ft_lstdelone_bonus.c ft_lstiter_bonus.c ft_lstlast_bonus.c \
 	   ft_lstmap_bonus.c ft_lstnew_bonus.c ft_lstsize_bonus.c \
