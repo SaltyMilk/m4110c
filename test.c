@@ -37,8 +37,7 @@ int main()
 	free(ptrs);	
 	show_alloc_mem();
 	printf("---\n");
-	
-	
+		
 	free((void *) 0x4242424242424242);
 	return (0);
 }

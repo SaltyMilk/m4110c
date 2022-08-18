@@ -89,6 +89,70 @@ void *malloc(size_t size)
 	return (NULL);
 }
 
+void *realloc(void *ptr, size_t size)
+{
+	size_t block_size;
+	t_alloc_sizes as;
+	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
+	void *tmp;
+	void *ret = ptr;
+
+	if (!ptr)
+		return NULL;
+	t_alloc_zones *zone = find_zone_by_ptr(ptr);
+	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
+		return NULL;
+	block_size = ptrh->len;
+	if (!(tmp = allocate(block_size)))
+		return NULL;
+	ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
+	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)) && zone->type != 'l')
+	{
+		if (zone->type == 't')
+		{
+			if (ptr + size < zone->ptr + as.tiny_alloc)
+				ptrh->len = size;
+			else
+			{
+				free(ptr);
+				if (!(ret = malloc(size)))
+					return NULL;
+				if (size >= block_size)
+					ft_memcpy(ret, tmp, block_size);
+				else
+					ft_memcpy(ret, tmp, size);
+			}
+		}
+		else if (zone->type == 's')
+		{
+			if (ptr + size < zone->ptr + as.small_alloc)
+				ptrh->len = size;
+			else
+			{
+				free(ptr);
+				if (!(ret = malloc(size)))
+					return NULL;
+				if (size >= block_size)
+					ft_memcpy(ret, tmp, block_size);
+				else
+					ft_memcpy(ret, tmp, size);
+			}	
+		}
+	}
+	else
+	{
+		free(ptr);
+		if (!(ret = malloc(size)))
+			return NULL;
+		if (size >= block_size)
+			ft_memcpy(ret, tmp, block_size);
+		else
+			ft_memcpy(ret, tmp, size);
+	}
+	munmap(tmp, block_size);
+	return ret;
+}
+
 void free(void *ptr)
 {
 	size_t block_size;
