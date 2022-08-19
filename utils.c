@@ -1,6 +1,6 @@
 #include "malloc.h"
 
-extern t_alloc_zones *allocs_ptr;
+extern t_alloc_zones *ft_allocs_ptr;
 
 void *allocate(size_t size)
 {
@@ -25,10 +25,10 @@ t_alloc_zones *search_free_zone(size_t size, char type)
 {
 	size_t i = 0;
 
-		while (*(char *)(allocs_ptr + i))
+		while (*(char *)(ft_allocs_ptr + i))
 		{
-			if ((allocs_ptr + i)->type == type && ( (allocs_ptr + i)->available_space >= size + sizeof(t_heap_header) || !(allocs_ptr +i)->ptr))
-				return (allocs_ptr + i);
+			if ((ft_allocs_ptr + i)->type == type && ( (ft_allocs_ptr + i)->available_space >= size + sizeof(t_heap_header) || !(ft_allocs_ptr +i)->ptr))
+				return (ft_allocs_ptr + i);
 			i++;
 		}
 	return (NULL);
@@ -64,10 +64,10 @@ size_t alloc_zone_len()
 {
 	size_t i = 0;
 
-	if (!allocs_ptr)
+	if (!ft_allocs_ptr)
 		return 0;
 
-	while (*(char *)(allocs_ptr + i))
+	while (*(char *)(ft_allocs_ptr + i))
 		i++;
 	return i;
 }
@@ -76,66 +76,66 @@ t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 {
 	void *ptr;
 	size_t new_zones_size;
-	if (!allocs_ptr)
+	if (!ft_allocs_ptr)
 	{
-		if (!(allocs_ptr = allocate(sizeof(t_alloc_zones) + 1)))
+		if (!(ft_allocs_ptr = allocate(sizeof(t_alloc_zones) + 1)))
 			return (NULL);
 		if (type == 's')
 		{
-			allocs_ptr->available_space = as.small_alloc;
+			ft_allocs_ptr->available_space = as.small_alloc;
 			if (!(ptr = allocate(as.small_alloc)))
 				return (NULL);
 		}
 		else if (type == 't')
 		{
-			allocs_ptr->available_space = as.tiny_alloc;
+			ft_allocs_ptr->available_space = as.tiny_alloc;
 			if (!(ptr = allocate(as.tiny_alloc)))
 				return (NULL);
 		}
 		else // 'l'
 		{
-			allocs_ptr->available_space = size + sizeof(t_heap_header);
+			ft_allocs_ptr->available_space = size + sizeof(t_heap_header);
 			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);
 		}
 		//Common part
-		allocs_ptr->ptr = ptr;
-		*(char *)(allocs_ptr + 1) = '\0';
-		allocs_ptr->type = type;
-		return (allocs_ptr);
+		ft_allocs_ptr->ptr = ptr;
+		*(char *)(ft_allocs_ptr + 1) = '\0';
+		ft_allocs_ptr->type = type;
+		return (ft_allocs_ptr);
 	}
 
 	//We're appending a new zone
 	new_zones_size = ((alloc_zone_len() + 1) * sizeof(t_alloc_zones)) + 1;
 	if (!(ptr = allocate(new_zones_size)))
 		return (NULL);
-	ft_memcpy(ptr, allocs_ptr, new_zones_size - sizeof(t_alloc_zones));
-	if (munmap(allocs_ptr, new_zones_size - sizeof(t_alloc_zones)) == -1)
+	ft_memcpy(ptr, ft_allocs_ptr, new_zones_size - sizeof(t_alloc_zones));
+	if (munmap(ft_allocs_ptr, new_zones_size - sizeof(t_alloc_zones)) == -1)
 		return (NULL);
-	allocs_ptr = ptr;
+	ft_allocs_ptr = ptr;
 	new_zones_size = alloc_zone_len();
 	if (type == 's')
 	{
-		(allocs_ptr + new_zones_size)->available_space = as.small_alloc;
+		(ft_allocs_ptr + new_zones_size)->available_space = as.small_alloc;
 			if (!(ptr = allocate(as.small_alloc)))
 				return (NULL);	
 	}
 	else if (type == 't')
 	{
-		(allocs_ptr + new_zones_size)->available_space = as.tiny_alloc;
+		(ft_allocs_ptr + new_zones_size)->available_space = as.tiny_alloc;
 			if (!(ptr = allocate(as.tiny_alloc)))
 				return (NULL);		
 	}
 	else // 'l'
 	{
-		(allocs_ptr + new_zones_size)->available_space = size + sizeof(t_heap_header);
+		(ft_allocs_ptr + new_zones_size)->available_space = size + sizeof(t_heap_header);
 			if (!(ptr = allocate(size + sizeof(t_heap_header))))
 				return (NULL);		
 	}
-	(allocs_ptr + new_zones_size)->type = type;
-	(allocs_ptr + new_zones_size)->ptr = ptr;
-	*(char *)(allocs_ptr + (new_zones_size) + 1) = '\0';
-	return ((allocs_ptr + new_zones_size));
+	(ft_allocs_ptr + new_zones_size)->type = type;
+	(ft_allocs_ptr + new_zones_size)->ptr = ptr;
+	*(char *)(ft_allocs_ptr + (new_zones_size) + 1) = '\0';
+	return ((ft_allocs_ptr + new_zones_size));
 }
 //mode = 0 no hexdump, 1 hexdumps blocks
 size_t print_zone(char *ptr, size_t size, char mode)
@@ -176,18 +176,18 @@ int is_in_starr(size_t *arr, size_t size, size_t value)
 void sort_allocs(size_t *indexs, size_t n_zones)
 {
 	for (size_t i = 0; i < n_zones; i++)
-		indexs[i] = (size_t)-1; //default value (case where allocs_ptr->ptr == null)
+		indexs[i] = (size_t)-1; //default value (case where ft_allocs_ptr->ptr == null)
 	for (size_t i = 0; i < n_zones; i++)
 	{
 		void *min = (void *)-1;
 		size_t min_index = -1;
 		for (size_t j = 0; j < n_zones; j++)
 		{
-			if (allocs_ptr[j].ptr && allocs_ptr[j].ptr < min)
+			if (ft_allocs_ptr[j].ptr && ft_allocs_ptr[j].ptr < min)
 			{
 				if (is_in_starr(indexs, n_zones, j))
 					continue;
-				min = allocs_ptr[j].ptr;
+				min = ft_allocs_ptr[j].ptr;
 				min_index = j;
 			}
 		}
@@ -204,12 +204,12 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		if ((allocs_ptr + i)->type == 's' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.small_alloc)
-			return (allocs_ptr + i);
-		else if ((allocs_ptr + i)->type == 't' && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + as.tiny_alloc)
-			return (allocs_ptr + i);
-		else if ((allocs_ptr + i)->type == 'l' && (allocs_ptr + i)->ptr && (allocs_ptr + i)->ptr <= ptr && ptr < (allocs_ptr + i)->ptr + ((t_heap_header *)(allocs_ptr + i)->ptr)->len + sizeof(t_heap_header))
-			return (allocs_ptr + i);
+		if ((ft_allocs_ptr + i)->type == 's' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.small_alloc)
+			return (ft_allocs_ptr + i);
+		else if ((ft_allocs_ptr + i)->type == 't' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.tiny_alloc)
+			return (ft_allocs_ptr + i);
+		else if ((ft_allocs_ptr + i)->type == 'l' && (ft_allocs_ptr + i)->ptr && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + ((t_heap_header *)(ft_allocs_ptr + i)->ptr)->len + sizeof(t_heap_header))
+			return (ft_allocs_ptr + i);
 	}
 	
 
