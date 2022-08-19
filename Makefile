@@ -32,7 +32,7 @@ fclean:
 	make -C libft fclean
 
 test:
-	gcc -fsanitize=address test.c $(NAME) -o testx; ./testx
+	gcc test.c $(NAME) -o testx; ./testx
 
 re : fclean all
 
