@@ -1,14 +1,14 @@
 #include "malloc.h"
 
-t_alloc_zones				*ft_allocs_ptr	= NULL;
-static pthread_mutex_t		ft_mutex		= PTHREAD_MUTEX_INITIALIZER;
+t_alloc_zones				*allocs_ptr	= NULL;
+static pthread_mutex_t		mutex		= PTHREAD_MUTEX_INITIALIZER;
 
 
 void *small_alloc(size_t size, t_alloc_sizes as)
 {
 	t_alloc_zones *free_zone_ptr;
 	char	*free_slice_ptr;
-	if (!ft_allocs_ptr || !(free_zone_ptr = search_free_zone(size, 's')))
+	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 's')))
 	{
 		if (!(free_zone_ptr = create_new_zone('s', as, size)))
 			return (NULL);
@@ -32,7 +32,7 @@ void *tiny_alloc(size_t size, t_alloc_sizes as)
 {
 	t_alloc_zones *free_zone_ptr;
 	char	*free_slice_ptr;
-	if (!ft_allocs_ptr || !(free_zone_ptr = search_free_zone(size, 't')))
+	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 't')))
 	{
 		if (!(free_zone_ptr = create_new_zone('t', as, size)))
 			return (NULL);
@@ -54,7 +54,7 @@ void *tiny_alloc(size_t size, t_alloc_sizes as)
 void *large_alloc(size_t size, t_alloc_sizes as)
 {
 	t_alloc_zones *free_zone_ptr;
-	if (!ft_allocs_ptr || !(free_zone_ptr = search_free_zone(size, 'l')))
+	if (!allocs_ptr || !(free_zone_ptr = search_free_zone(size, 'l')))
 	{
 		if (!(free_zone_ptr = create_new_zone('l', as, size)))
 			return (NULL);
@@ -75,24 +75,24 @@ void *malloc(size_t size)
 	t_alloc_sizes as;
 	void *ret;
 
-	pthread_mutex_lock(&ft_mutex);
+	pthread_mutex_lock(&mutex);
 	get_sizes(&as);
 	if (size <= as.tiny_limit)
 	{
 		ret = tiny_alloc(size, as);	
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return ret;
 	}
 	else if (size <= as.small_limit)
 	{
 		ret = small_alloc(size, as);
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return ret;
 	}
 	else
 	{
 		ret = large_alloc(size, as);
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return ret;
 	}
 }
@@ -107,18 +107,18 @@ void *realloc(void *ptr, size_t size)
 
 	if (!ptr)
 		return NULL;
-	pthread_mutex_lock(&ft_mutex);
+	pthread_mutex_lock(&mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return NULL;
 	}
 	get_sizes(&as);
 	block_size = ptrh->len;
 	if (!(tmp = allocate(block_size)))
 	{
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return NULL;
 	}
 	ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
@@ -135,11 +135,11 @@ void *realloc(void *ptr, size_t size)
 			}
 			else
 			{
-				pthread_mutex_unlock(&ft_mutex);
+				pthread_mutex_unlock(&mutex);
 				free(ptr);
 				if (!(ret = malloc(size)))
 					return NULL;
-				pthread_mutex_lock(&ft_mutex);
+				pthread_mutex_lock(&mutex);
 				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
@@ -156,11 +156,11 @@ void *realloc(void *ptr, size_t size)
 			}
 			else
 			{
-				pthread_mutex_unlock(&ft_mutex);
+				pthread_mutex_unlock(&mutex);
 				free(ptr);
 				if (!(ret = malloc(size)))
 					return NULL;
-				pthread_mutex_lock(&ft_mutex);
+				pthread_mutex_lock(&mutex);
 				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
@@ -170,18 +170,18 @@ void *realloc(void *ptr, size_t size)
 	}
 	else //zone transfer
 	{
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		free(ptr);
 		if (!(ret = malloc(size)))
 			return NULL;
-		pthread_mutex_lock(&ft_mutex);
+		pthread_mutex_lock(&mutex);
 		if (size >= block_size)
 			ft_memcpy(ret, tmp, block_size);
 		else
 			ft_memcpy(ret, tmp, size);
 	}
 	munmap(tmp, block_size);
-	pthread_mutex_unlock(&ft_mutex);
+	pthread_mutex_unlock(&mutex);
 	return ret;
 }
 
@@ -193,11 +193,11 @@ void free(void *ptr)
 
 	if (!ptr)
 		return;
-	pthread_mutex_lock(&ft_mutex);
+	pthread_mutex_lock(&mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		pthread_mutex_unlock(&ft_mutex);
+		pthread_mutex_unlock(&mutex);
 		return;
 	}
 	block_size = ptrh->len;
@@ -211,12 +211,12 @@ void free(void *ptr)
 		munmap(zone->ptr, zone->available_space);
 		zone->ptr = NULL;
 	}
-	pthread_mutex_unlock(&ft_mutex);
+	pthread_mutex_unlock(&mutex);
 }
 
 void show_alloc_mem()
 {
-	pthread_mutex_lock(&ft_mutex);
+	pthread_mutex_lock(&mutex);
 	t_alloc_sizes as;
 	size_t n_zones = alloc_zone_len();
 	size_t total = 0;
@@ -227,29 +227,29 @@ void show_alloc_mem()
 	sort_allocs(indexs, n_zones);
 	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
 	{
-		if (ft_allocs_ptr[indexs[i]].type == 't')
+		if (allocs_ptr[indexs[i]].type == 't')
 			ft_printf("TINY : ");
-		else if (ft_allocs_ptr[indexs[i]].type == 's')
+		else if (allocs_ptr[indexs[i]].type == 's')
 			ft_printf("SMALL : ");
-		else if (ft_allocs_ptr[indexs[i]].type == 'l')
+		else if (allocs_ptr[indexs[i]].type == 'l')
 			ft_printf("LARGE : ");
-		ft_printf("Ox%X\n", (unsigned long long)ft_allocs_ptr[indexs[i]].ptr);
+		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
-		if (ft_allocs_ptr[indexs[i]].type == 's')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, as.small_alloc, 0);
-		else if (ft_allocs_ptr[indexs[i]].type == 't')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 0);
-		else if (ft_allocs_ptr[indexs[i]].type == 'l')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, 0, 0);
+		if (allocs_ptr[indexs[i]].type == 's')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc, 0);
+		else if (allocs_ptr[indexs[i]].type == 't')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 0);
+		else if (allocs_ptr[indexs[i]].type == 'l')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, 0, 0);
 	}
 
 	ft_printf("Total : %u bytes\n", total);	
-	pthread_mutex_unlock(&ft_mutex);
+	pthread_mutex_unlock(&mutex);
 }
 
 void show_alloc_mem_ex()
 {
-	pthread_mutex_lock(&ft_mutex);
+	pthread_mutex_lock(&mutex);
 	t_alloc_sizes as;
 	size_t n_zones = alloc_zone_len();
 	size_t total = 0;
@@ -260,23 +260,23 @@ void show_alloc_mem_ex()
 	sort_allocs(indexs, n_zones);
 	for (size_t i = 0; i < n_zones && indexs[i] != (size_t)-1; i++)
 	{
-		if (ft_allocs_ptr[indexs[i]].type == 't')
+		if (allocs_ptr[indexs[i]].type == 't')
 			ft_printf("TINY : ");
-		else if (ft_allocs_ptr[indexs[i]].type == 's')
+		else if (allocs_ptr[indexs[i]].type == 's')
 			ft_printf("SMALL : ");
-		else if (ft_allocs_ptr[indexs[i]].type == 'l')
+		else if (allocs_ptr[indexs[i]].type == 'l')
 			ft_printf("LARGE : ");
-		ft_printf("Ox%X\n", (unsigned long long)ft_allocs_ptr[indexs[i]].ptr);
+		ft_printf("Ox%X\n", (unsigned long long)allocs_ptr[indexs[i]].ptr);
 		//Now we gotta parse the zone to display each block
-		if (ft_allocs_ptr[indexs[i]].type == 's')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, as.small_alloc, 1);
-		else if (ft_allocs_ptr[indexs[i]].type == 't')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 1);
-		else if (ft_allocs_ptr[indexs[i]].type == 'l')
-			total += print_zone(ft_allocs_ptr[indexs[i]].ptr, 0, 1);
+		if (allocs_ptr[indexs[i]].type == 's')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.small_alloc, 1);
+		else if (allocs_ptr[indexs[i]].type == 't')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, as.tiny_alloc, 1);
+		else if (allocs_ptr[indexs[i]].type == 'l')
+			total += print_zone(allocs_ptr[indexs[i]].ptr, 0, 1);
 	}
 
 	ft_printf("Total : %u bytes\n", total);	
-	pthread_mutex_unlock(&ft_mutex);
+	pthread_mutex_unlock(&mutex);
 
 }
