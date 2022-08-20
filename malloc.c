@@ -70,6 +70,11 @@ void *large_alloc(size_t size, t_alloc_sizes as)
 	return (free_zone_ptr->ptr + sizeof(t_heap_header));
 }
 
+void *calloc(size_t n, size_t s)
+{
+	return malloc(n * s);
+}
+
 void *malloc(size_t size)
 {
 	t_alloc_sizes as;

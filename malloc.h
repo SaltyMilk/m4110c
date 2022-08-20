@@ -33,6 +33,7 @@ void	*malloc(size_t size);
 void	*realloc(void *ptr, size_t size);
 void	show_alloc_mem();
 void	show_alloc_mem_ex();
+void	*calloc(size_t n, size_t s);
 
 //INTERNAL TOOLS
 void			*allocate(size_t size);
