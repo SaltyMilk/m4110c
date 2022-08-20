@@ -72,6 +72,7 @@ void *large_alloc(size_t size, t_alloc_sizes as)
 
 void *calloc(size_t n, size_t s)
 {
+	ft_printf("My calloc was used\n");
 	return malloc(n * s);
 }
 
