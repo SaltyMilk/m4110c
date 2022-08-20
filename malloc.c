@@ -85,7 +85,7 @@ void *malloc(size_t size)
 		ret = tiny_alloc(size, as);	
 		pthread_mutex_unlock(&ft_mutex);
 		if (ret)
-			ft_printf("suceess\n");
+			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 	else if (size <= as.small_limit)
@@ -93,7 +93,7 @@ void *malloc(size_t size)
 		ret = small_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
 		if (ret)
-			ft_printf("suceess\n");
+			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 	else
@@ -101,7 +101,7 @@ void *malloc(size_t size)
 		ret = large_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
 		if (ret)
-			ft_printf("suceess\n");
+			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 }
@@ -210,7 +210,8 @@ void free(void *ptr)
 	t_alloc_sizes as;
 	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
 
-	ft_printf("My free was used !\n");
+	ft_printf("My free was used !");
+	ft_printf(" on [0x%X]\n", ptr);
 	if (!ptr)
 		return;
 	pthread_mutex_lock(&ft_mutex);
