@@ -112,7 +112,9 @@ void *realloc(void *ptr, size_t size)
 	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	pthread_mutex_lock(&ft_mutex);
+	ft_printf("Looking for a free zone\n");
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
+	ft_printf("Done looking for a free zone !\n");
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
 		pthread_mutex_unlock(&ft_mutex);
