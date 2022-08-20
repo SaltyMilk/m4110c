@@ -129,6 +129,7 @@ void *realloc(void *ptr, size_t size)
 	//if we don't need a zone transfer
 	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
 	{
+		ft_printf("we didn't have to transfer zones\n");
 		if (zone->type == 't')
 		{
 			if (ptr + size < zone->ptr + as.tiny_alloc)//we can just increase block size
@@ -174,6 +175,7 @@ void *realloc(void *ptr, size_t size)
 	}
 	else //zone transfer
 	{
+		ft_printf("we had to transfer zones\n");
 		pthread_mutex_unlock(&ft_mutex);
 		free(ptr);
 		if (!(ret = malloc(size)))
@@ -186,6 +188,7 @@ void *realloc(void *ptr, size_t size)
 	}
 	munmap(tmp, block_size);
 	pthread_mutex_unlock(&ft_mutex);
+	ft_printf("My realloc was used and we got to the nd of it ! !\n");
 	return ret;
 }
 
