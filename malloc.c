@@ -233,6 +233,7 @@ void free(void *ptr)
 		zone->ptr = NULL;
 	}
 	pthread_mutex_unlock(&ft_mutex);
+	ft_printf("Free success !\n");
 }
 
 void show_alloc_mem()
