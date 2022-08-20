@@ -108,6 +108,7 @@ void *realloc(void *ptr, size_t size)
 	void *tmp;
 	void *ret = ptr;
 
+	ft_printf("My realloc was used !\n");
 	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	pthread_mutex_lock(&ft_mutex);
@@ -194,6 +195,7 @@ void free(void *ptr)
 	t_alloc_sizes as;
 	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
 
+	ft_printf("My free was used !\n");
 	if (!ptr)
 		return;
 	pthread_mutex_lock(&ft_mutex);
