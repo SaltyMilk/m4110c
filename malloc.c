@@ -75,6 +75,9 @@ void *malloc(size_t size)
 	t_alloc_sizes as;
 	void *ret;
 
+	if (size >= SIZE_MAX - sizeof(t_heap_header))
+		return NULL;
+	ft_printf("My malloc was used !\n");
 	pthread_mutex_lock(&ft_mutex);
 	get_sizes(&as);
 	if (size <= as.tiny_limit)
@@ -105,7 +108,7 @@ void *realloc(void *ptr, size_t size)
 	void *tmp;
 	void *ret = ptr;
 
-	if (!ptr)
+	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	pthread_mutex_lock(&ft_mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
