@@ -84,18 +84,24 @@ void *malloc(size_t size)
 	{
 		ret = tiny_alloc(size, as);	
 		pthread_mutex_unlock(&ft_mutex);
+		if (ret)
+			ft_printf("suceess\n");
 		return ret;
 	}
 	else if (size <= as.small_limit)
 	{
 		ret = small_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
+		if (ret)
+			ft_printf("suceess\n");
 		return ret;
 	}
 	else
 	{
 		ret = large_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
+		if (ret)
+			ft_printf("suceess\n");
 		return ret;
 	}
 }
