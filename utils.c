@@ -72,6 +72,18 @@ size_t alloc_zone_len()
 	return i;
 }
 
+size_t zones_len(t_alloc_zones *zone)
+{
+	size_t i = 0;
+
+	if (!zone)
+		return 0;
+
+	while (*(char *)(zone + i))
+		i++;
+	return i;
+}
+
 t_alloc_zones *create_new_zone(char type, t_alloc_sizes as, size_t size)
 {
 	void *ptr;
@@ -273,4 +285,26 @@ void hexdump(char *ptr, size_t size)
 	}
 		ft_printf("\n\n");
 		ft_printf(RESET);
+}
+
+void delete_meta_zone(t_alloc_zones *zone)
+{
+	size_t	len = alloc_zone_len();
+	char	*nptr;
+	size_t	offset;
+
+	if (len == 1)
+	{
+		munmap(ft_allocs_ptr, sizeof(t_alloc_zones) + 1);
+		ft_allocs_ptr = NULL;
+	}
+	if (!(nptr = allocate(((len - 1) * sizeof(t_alloc_zones)) + 1 )))
+		return;
+	offset = (size_t) (zone - ft_allocs_ptr);
+	ft_memmove(nptr, ft_allocs_ptr, offset);
+	if (offset / sizeof(t_alloc_zones) < len - 1) //zone to be delete is between least two zones
+		ft_memmove(nptr, zone + 1, zones_len(zone + 1) * sizeof(t_alloc_zones));
+	nptr[((len - 1) * sizeof(t_alloc_zones))] = '\0';
+	munmap(ft_allocs_ptr, (sizeof(t_alloc_zones) * len) + 1);
+	ft_allocs_ptr = (t_alloc_zones *)nptr;
 }

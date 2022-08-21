@@ -122,15 +122,9 @@ void *realloc(void *ptr, size_t size)
 
 	ft_printf("My realloc was used !\n");
 	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
-	{
-		ft_printf("took the quick exit[%p]\n", ptr);
 		return NULL;
-	}
-	ft_printf("or is it the mutex ?\n");
 	pthread_mutex_lock(&ft_mutex);
-	ft_printf("Looking for a free zone\n");
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
-	ft_printf("Done looking for a free zone !\n");
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
 		pthread_mutex_unlock(&ft_mutex);
@@ -147,7 +141,6 @@ void *realloc(void *ptr, size_t size)
 	//if we don't need a zone transfer
 	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
 	{
-		ft_printf("we didn't have to transfer zones\n");
 		if (zone->type == 't')
 		{
 			if (ptr + size < zone->ptr + as.tiny_alloc)//we can just increase block size
@@ -193,7 +186,6 @@ void *realloc(void *ptr, size_t size)
 	}
 	else //zone transfer
 	{
-		ft_printf("we had to transfer zones\n");
 		pthread_mutex_unlock(&ft_mutex);
 		free(ptr);
 		if (!(ret = malloc(size)))
@@ -206,7 +198,7 @@ void *realloc(void *ptr, size_t size)
 	}
 	munmap(tmp, block_size);
 	pthread_mutex_unlock(&ft_mutex);
-	ft_printf("My realloc was used and we got to the nd of it ! !\n");
+	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
 }
 
@@ -237,6 +229,7 @@ void free(void *ptr)
 	{
 		munmap(zone->ptr, zone->available_space);
 		zone->ptr = NULL;
+		delete_meta_zone(zone);
 	}
 	pthread_mutex_unlock(&ft_mutex);
 	ft_printf("Free success !\n");

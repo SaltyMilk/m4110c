@@ -48,5 +48,6 @@ void			sort_allocs(size_t *indexs, size_t n_zones);
 t_alloc_zones	*find_zone_by_ptr(void *ptr);
 int				allocate_ptr(char type, t_alloc_sizes as, t_alloc_zones *zone, size_t size);
 void			hexdump(char *ptr, size_t size);
+void			delete_meta_zone(t_alloc_zones *zone);
 
 #endif
