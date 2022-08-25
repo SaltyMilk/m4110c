@@ -76,7 +76,17 @@ void *calloc(size_t n, size_t s)
 	return malloc(n * s);
 }
 
-void *malloc(size_t size)
+void* malloc(size_t size)
+{
+	size_t al_size;
+
+	if (size >= SIZE_MAX - sizeof(t_heap_header))
+		return NULL;
+	al_size = size + ((16 - (size % 16)) != 0) ? (16 - (size % 16)) : 0;
+	return (mallocx(al_size));
+}
+
+void *mallocx(size_t size)
 {
 	t_alloc_sizes as;
 	void *ret;

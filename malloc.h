@@ -36,6 +36,7 @@ void	show_alloc_mem_ex();
 void	*calloc(size_t n, size_t s);
 
 //INTERNAL TOOLS
+void			*mallocx(size_t size);
 void			*allocate(size_t size);
 void			get_sizes(t_alloc_sizes *as);
 t_alloc_zones	*search_free_zone(size_t size, char type);
