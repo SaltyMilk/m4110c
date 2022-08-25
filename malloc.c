@@ -217,7 +217,7 @@ void free(void *ptr)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		ft_printf("[%p] Wasn't allocated by me !\n", zone);
+		ft_printf("[%p] Wasn't allocated by me !\n", ptr);
 		pthread_mutex_unlock(&ft_mutex);
 		return;
 	}
