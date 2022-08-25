@@ -129,6 +129,8 @@ void *realloc(void *ptr, size_t size)
 	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
 	void *tmp;
 	void *ret = ptr;
+	size_t al_size = size + ((((size % 16)) != 0) ? (16 - (size % 16)) : 0);
+	size = al_size;
 
 	ft_printf("My realloc was used on [%p]!\n", ptr);
 	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
