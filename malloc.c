@@ -82,7 +82,7 @@ void* malloc(size_t size)
 
 	if (size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
-	al_size = size + (((16 - (size % 16)) != 0) ? (16 - (size % 16)) : 0);
+	al_size = size + ((((size % 16)) != 0) ? (16 - (size % 16)) : 0);
 	return (mallocx(al_size));
 }
 
