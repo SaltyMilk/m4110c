@@ -203,7 +203,7 @@ void *realloc(void *ptr, size_t size)
 	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
 }
-#include <stdio.h>
+
 void free(void *ptr)
 {
 	size_t block_size;
@@ -218,7 +218,7 @@ void free(void *ptr)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		printf("[%p] Wasn't allocated by me !\n", zone);
+		ft_printf("[%p] Wasn't allocated by me !\n", zone);
 		pthread_mutex_unlock(&ft_mutex);
 		return;
 	}
