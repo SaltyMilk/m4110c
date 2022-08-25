@@ -216,15 +216,22 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		if ((ft_allocs_ptr + i)->type == 's' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.small_alloc)
+		if ((ft_allocs_ptr + i)->type == 's' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.small_alloc){
+			ft_printf("SMALL\n");
 			return (ft_allocs_ptr + i);
+		}
 		else if ((ft_allocs_ptr + i)->type == 't' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.tiny_alloc)
+		{
+			ft_printf("TINY\n");
 			return (ft_allocs_ptr + i);
+		}
 		else if ((ft_allocs_ptr + i)->type == 'l' && (ft_allocs_ptr + i)->ptr && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + ((t_heap_header *)(ft_allocs_ptr + i)->ptr)->len + sizeof(t_heap_header))
+		{
+			ft_printf("LARGE\n");
 			return (ft_allocs_ptr + i);
+			}
 	}
 	
-
 	return (NULL);	
 }
 
@@ -297,13 +304,14 @@ void delete_meta_zone(t_alloc_zones *zone)
 	{
 		munmap(ft_allocs_ptr, sizeof(t_alloc_zones) + 1);
 		ft_allocs_ptr = NULL;
+		return;
 	}
 	if (!(nptr = allocate(((len - 1) * sizeof(t_alloc_zones)) + 1 )))
 		return;
 	offset = (size_t) (zone - ft_allocs_ptr);
-	ft_memmove(nptr, ft_allocs_ptr, offset);
+	ft_memcpy(nptr, ft_allocs_ptr, offset);
 	if (offset / sizeof(t_alloc_zones) < len - 1) //zone to be delete is between least two zones
-		ft_memmove(nptr, zone + 1, zones_len(zone + 1) * sizeof(t_alloc_zones));
+		ft_memcpy(nptr, zone + 1, zones_len(zone + 1) * sizeof(t_alloc_zones));
 	nptr[((len - 1) * sizeof(t_alloc_zones))] = '\0';
 	munmap(ft_allocs_ptr, (sizeof(t_alloc_zones) * len) + 1);
 	ft_allocs_ptr = (t_alloc_zones *)nptr;

@@ -120,13 +120,14 @@ void *realloc(void *ptr, size_t size)
 	void *tmp;
 	void *ret = ptr;
 
-	ft_printf("My realloc was used !\n");
+	ft_printf("My realloc was used on [%p]!\n", ptr);
 	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	pthread_mutex_lock(&ft_mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
+		ft_printf("[%p] this ptr wasn't allocated by me\n");
 		pthread_mutex_unlock(&ft_mutex);
 		return NULL;
 	}
@@ -201,7 +202,7 @@ void *realloc(void *ptr, size_t size)
 	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
 }
-
+#include <stdio.h>
 void free(void *ptr)
 {
 	size_t block_size;
@@ -216,6 +217,7 @@ void free(void *ptr)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
+		printf("[%p] Wasn't allocated by me !\n", zone);
 		pthread_mutex_unlock(&ft_mutex);
 		return;
 	}
@@ -229,7 +231,7 @@ void free(void *ptr)
 	{
 		munmap(zone->ptr, zone->available_space);
 		zone->ptr = NULL;
-		delete_meta_zone(zone);
+	//	delete_meta_zone(zone);
 	}
 	pthread_mutex_unlock(&ft_mutex);
 	ft_printf("Free success !\n");
