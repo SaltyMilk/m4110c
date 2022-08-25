@@ -209,7 +209,7 @@ void *realloc(void *ptr, size_t size)
 		else
 			ft_memcpy(ret, tmp, size);*/
 	}
-	munmap(tmp, block_size);
+	//munmap(tmp, block_size);
 	pthread_mutex_unlock(&ft_mutex);
 	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
