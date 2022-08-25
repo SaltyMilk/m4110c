@@ -127,7 +127,7 @@ void *realloc(void *ptr, size_t size)
 	size_t block_size;
 	t_alloc_sizes as;
 	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
-	//void *tmp;
+	void *tmp;
 	void *ret = ptr;
 	size_t al_size = size + ((((size % 16)) != 0) ? (16 - (size % 16)) : 0);
 	size = al_size;
@@ -145,11 +145,11 @@ void *realloc(void *ptr, size_t size)
 	}
 	get_sizes(&as);
 	block_size = ptrh->len;
-	/*if (!(tmp = allocate(block_size)))
+	if (!(tmp = allocate(block_size)))
 	{
 		pthread_mutex_unlock(&ft_mutex);
 		return NULL;
-	}*/
+	}
 	//ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
 	//if we don't need a zone transfer
 	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
@@ -169,10 +169,10 @@ void *realloc(void *ptr, size_t size)
 				if (!(ret = malloc(size)))
 					return NULL;
 				pthread_mutex_lock(&ft_mutex);
-			/*	if (size >= block_size)
+				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
-					ft_memcpy(ret, tmp, size);*/
+					ft_memcpy(ret, tmp, size);
 			}
 		}
 		else if (zone->type == 's')
@@ -190,10 +190,10 @@ void *realloc(void *ptr, size_t size)
 				if (!(ret = malloc(size)))
 					return NULL;
 				pthread_mutex_lock(&ft_mutex);
-				/*if (size >= block_size)
+				if (size >= block_size)
 					ft_memcpy(ret, tmp, block_size);
 				else
-					ft_memcpy(ret, tmp, size);*/
+					ft_memcpy(ret, tmp, size);
 			}	
 		}
 	}
@@ -204,12 +204,12 @@ void *realloc(void *ptr, size_t size)
 		if (!(ret = malloc(size)))
 			return NULL;
 		pthread_mutex_lock(&ft_mutex);
-		/*if (size >= block_size)
+		if (size >= block_size)
 			ft_memcpy(ret, tmp, block_size);
 		else
-			ft_memcpy(ret, tmp, size);*/
+			ft_memcpy(ret, tmp, size);
 	}
-	//munmap(tmp, block_size);
+	munmap(tmp, block_size);
 	pthread_mutex_unlock(&ft_mutex);
 	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
