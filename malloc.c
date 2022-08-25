@@ -133,7 +133,9 @@ void *realloc(void *ptr, size_t size)
 	size = al_size;
 
 	ft_printf("My realloc was used on [%p]!\n", ptr);
-	if (!ptr || size >= SIZE_MAX - sizeof(t_heap_header))
+	if (!ptr)
+		return malloc(size);
+	if (size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	pthread_mutex_lock(&ft_mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
