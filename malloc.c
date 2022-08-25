@@ -85,6 +85,7 @@ void *malloc(size_t size)
 		return NULL;
 	ft_printf("My malloc was used !\n");
 	pthread_mutex_lock(&ft_mutex);
+	ft_printf("lock blocked ?\n");
 	get_sizes(&as);
 	if (size <= as.tiny_limit)
 	{
