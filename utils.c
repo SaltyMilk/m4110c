@@ -216,20 +216,12 @@ t_alloc_zones *find_zone_by_ptr(void *ptr)
 
 	for (size_t i = 0; i < n_zones; i++)
 	{
-		if ((ft_allocs_ptr + i)->type == 's' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.small_alloc){
-			ft_printf("SMALL\n");
+		if ((ft_allocs_ptr + i)->type == 's' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.small_alloc)
 			return (ft_allocs_ptr + i);
-		}
 		else if ((ft_allocs_ptr + i)->type == 't' && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + as.tiny_alloc)
-		{
-			ft_printf("TINY\n");
 			return (ft_allocs_ptr + i);
-		}
 		else if ((ft_allocs_ptr + i)->type == 'l' && (ft_allocs_ptr + i)->ptr && (ft_allocs_ptr + i)->ptr <= ptr && ptr < (ft_allocs_ptr + i)->ptr + ((t_heap_header *)(ft_allocs_ptr + i)->ptr)->len + sizeof(t_heap_header))
-		{
-			ft_printf("LARGE\n");
 			return (ft_allocs_ptr + i);
-			}
 	}
 	
 	return (NULL);	
