@@ -72,7 +72,6 @@ void *large_alloc(size_t size, t_alloc_sizes as)
 
 void *calloc(size_t n, size_t s)
 {
-	ft_printf("My calloc was used\n");
 	return malloc(n * s);
 }
 
@@ -93,31 +92,24 @@ void *mallocx(size_t size)
 
 	if (size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
-	ft_printf("My malloc was used !\n");
 	pthread_mutex_lock(&ft_mutex);
 	get_sizes(&as);
 	if (size <= as.tiny_limit)
 	{
 		ret = tiny_alloc(size, as);	
 		pthread_mutex_unlock(&ft_mutex);
-		if (ret)
-			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 	else if (size <= as.small_limit)
 	{
 		ret = small_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
-		if (ret)
-			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 	else
 	{
 		ret = large_alloc(size, as);
 		pthread_mutex_unlock(&ft_mutex);
-		if (ret)
-			ft_printf("suceess[0x%X]\n", ret);
 		return ret;
 	}
 }
@@ -132,7 +124,6 @@ void *realloc(void *ptr, size_t size)
 	size_t al_size = size + ((((size % 16)) != 0) ? (16 - (size % 16)) : 0);
 	size = al_size;
 
-	ft_printf("My realloc was used on [%p]!\n", ptr);
 	if (!ptr)
 		return malloc(size);
 	if (size >= SIZE_MAX - sizeof(t_heap_header))
@@ -141,7 +132,6 @@ void *realloc(void *ptr, size_t size)
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		ft_printf("[%p] this ptr wasn't allocated by me\n");
 		pthread_mutex_unlock(&ft_mutex);
 		return NULL;
 	}
@@ -213,7 +203,6 @@ void *realloc(void *ptr, size_t size)
 	}
 	munmap(tmp, block_size);
 	pthread_mutex_unlock(&ft_mutex);
-	ft_printf("My realloc was used and we got to the end of it ! !\n");
 	return ret;
 }
 
@@ -223,15 +212,12 @@ void free(void *ptr)
 	t_alloc_sizes as;
 	t_heap_header *ptrh = (t_heap_header *)(((char *)ptr) - sizeof(t_heap_header));
 
-	ft_printf("My free was used !");
-	ft_printf(" on [0x%X]\n", ptr);
 	if (!ptr)
 		return;
 	pthread_mutex_lock(&ft_mutex);
 	t_alloc_zones *zone = find_zone_by_ptr(ptr);
 	if (!zone || !ptrh->used)//None allocated, or not used blocks will be ignored
 	{
-		ft_printf("[%p] Wasn't allocated by me !\n", ptr);
 		pthread_mutex_unlock(&ft_mutex);
 		return;
 	}
@@ -248,7 +234,6 @@ void free(void *ptr)
 	//	delete_meta_zone(zone);
 	}
 	pthread_mutex_unlock(&ft_mutex);
-	ft_printf("Free success !\n");
 }
 
 void show_alloc_mem()
