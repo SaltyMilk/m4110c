@@ -142,7 +142,7 @@ void *realloc(void *ptr, size_t size)
 		pthread_mutex_unlock(&ft_mutex);
 		return NULL;
 	}
-	//ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
+	ft_memcpy(tmp, ptr, block_size);//save content of previous allocation
 	//if we don't need a zone transfer
 	if (((zone->type == 't' && size <= as.tiny_limit) || (zone->type == 's' && size <= as.small_limit && size > as.tiny_limit)))
 	{
