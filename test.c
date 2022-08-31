@@ -45,7 +45,7 @@ int main()
 	ptr2[42] = 0;
 
 	show_alloc_mem_ex();
-	free(ptr);
+	free(ptr2);
 	puts("Let's just check we left no leaks");
 	show_alloc_mem_ex();
 	return (0);
