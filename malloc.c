@@ -231,7 +231,7 @@ void free(void *ptr)
 	{
 		munmap(zone->ptr, zone->available_space);
 		zone->ptr = NULL;
-	//	delete_meta_zone(zone);
+		delete_meta_zone(zone);
 	}
 	pthread_mutex_unlock(&ft_mutex);
 }
