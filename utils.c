@@ -16,9 +16,9 @@ void get_sizes(t_alloc_sizes *as)
 	int pagesize = getpagesize();
 
 	as->tiny_alloc = pagesize * 8;
-	as->tiny_limit = (pagesize / 32) - sizeof(t_heap_header);
+	as->tiny_limit = ((pagesize * 8)/100) - sizeof(t_heap_header);
 	as->small_alloc = pagesize * 64;
-	as->small_limit = (pagesize/2) - sizeof(t_heap_header);
+	as->small_limit = ((pagesize*64)/100) - sizeof(t_heap_header);
 }
 
 t_alloc_zones *search_free_zone(size_t size, char type)
