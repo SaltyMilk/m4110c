@@ -77,11 +77,12 @@ void *calloc(size_t n, size_t s)
 
 void* malloc(size_t size)
 {
-	size_t al_size;
-
+	size_t al_size = size;
+/** align mem
 	if (size >= SIZE_MAX - sizeof(t_heap_header))
 		return NULL;
 	al_size = size + ((((size % 16)) != 0) ? (16 - (size % 16)) : 0);
+**/
 	return (mallocx(al_size));
 }
 
