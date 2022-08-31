@@ -17,8 +17,8 @@ void get_sizes(t_alloc_sizes *as)
 
 	as->tiny_alloc = pagesize;
 	as->tiny_limit = (pagesize / 100) - sizeof(t_heap_header);
-	as->small_alloc = pagesize * 10;
-	as->small_limit = (pagesize / 10) - sizeof(t_heap_header);
+	as->small_alloc = pagesize * 1000;
+	as->small_limit = (pagesize * 10) - sizeof(t_heap_header);
 }
 
 t_alloc_zones *search_free_zone(size_t size, char type)
@@ -285,7 +285,6 @@ void hexdump(char *ptr, size_t size)
 		ft_printf("\n\n");
 		ft_printf(RESET);
 }
-
 void delete_meta_zone(t_alloc_zones *zone)
 {
 	size_t	len = alloc_zone_len();
