@@ -290,7 +290,6 @@ void delete_meta_zone(t_alloc_zones *zone)
 {
 	size_t	len = alloc_zone_len();
 	char	*nptr;
-	size_t	offset;
 
 	if (len == 1)
 	{
@@ -300,10 +299,18 @@ void delete_meta_zone(t_alloc_zones *zone)
 	}
 	if (!(nptr = allocate(((len - 1) * sizeof(t_alloc_zones)) + 1 )))
 		return;
-	offset = (size_t) (zone - ft_allocs_ptr);
-	ft_memcpy(nptr, ft_allocs_ptr, offset);
-	if (offset / sizeof(t_alloc_zones) < len - 1) //zone to be delete is between least two zones
-		ft_memcpy(nptr, zone + 1, zones_len(zone + 1) * sizeof(t_alloc_zones));
+	if (zone->ptr == ft_allocs_ptr->ptr) //we gotta remove first zone
+		ft_memcpy(nptr, ft_allocs_ptr + 1 , (len - 1 ) * sizeof(t_alloc_zones));
+	else
+	{
+		if (zones_len(zone) == 1) // last zone to remove
+			ft_memcpy(nptr, ft_allocs_ptr, sizeof(t_alloc_zones) * (len - 1));
+		else //zone to be delete is between least two zones
+		{
+			ft_memcpy(nptr, ft_allocs_ptr, ((len - zones_len(zone))) * sizeof(t_alloc_zones));
+			ft_memcpy(nptr + ((len - zones_len(zone)) * sizeof(t_alloc_zones)), zone + 1, zones_len(zone + 1) * sizeof(t_alloc_zones));
+		}
+	}
 	nptr[((len - 1) * sizeof(t_alloc_zones))] = '\0';
 	munmap(ft_allocs_ptr, (sizeof(t_alloc_zones) * len) + 1);
 	ft_allocs_ptr = (t_alloc_zones *)nptr;
